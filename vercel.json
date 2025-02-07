@@ -3,7 +3,7 @@
     "builds": [
         {
             "src": "index.py",
-            "use": "@vercel/pthon",
+            "use": "@vercel/python",
             "config":{"runtime":"python3.8"}
         }
     ],
