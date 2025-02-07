@@ -1,2 +1,2 @@
 Flask
-google-genrativai
+google-generativeai
