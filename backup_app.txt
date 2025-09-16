@@ -1,15 +1,13 @@
 from flask import Flask, request, jsonify, render_template
-from openai import OpenAI
+import google.generativeai as genai
 import re
 
 # Initialize Flask app
 app = Flask(__name__)
 
-# Configure OpenRouter client
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key="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",  # Replace with your actual OpenRouter API key
-)
+# Configure Gemini AI with the API key
+genai.configure(api_key="AIzaSyBjqSYnsr2Le7-QgX_eoATrrQ-Y9mGNS2U")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 def format_response(content):
     """
@@ -45,29 +43,16 @@ def index():
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    """Handle user messages and generate responses using OpenRouter AI."""
+    """Handle user messages and generate responses using Gemini AI."""
     user_message = request.json.get("message")
     
     if not user_message:
         return jsonify({"error": "Message is required"}), 400
 
     try:
-        # Generate a response from the OpenRouter model
-        completion = client.chat.completions.create(
-            extra_headers={
-                "HTTP-Referer": "http://localhost:5000",  # Optional. Site URL for rankings on openrouter.ai.
-                "X-Title": "Chatbot App",  # Optional. Site title for rankings on openrouter.ai.
-            },
-            extra_body={},
-            model="qwen/qwen3-coder:free",  # Using a free model from OpenRouter
-            messages=[
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            ]
-        )
-        bot_response = completion.choices[0].message.content
+        # Generate a response from the Gemini model
+        response = model.generate_content(user_message)
+        bot_response = response.text
 
         # Format the response for HTML rendering
         formatted_response = format_response(bot_response)
